@@ -16,6 +16,7 @@
 ;;; (clojure.java.io/resource "suspects.csv"))` would make it work after you
 ;;; build a jar. I see that the task asks you to do it directly on toplevel,
 ;;; though.
+;;;; Noted
 ;;;
 ;;; Another note: I see that your lines end with a comma:
 ;;;
@@ -23,6 +24,7 @@
 ;;;            ^ here
 ;;;
 ;;; I suspect that might give us some problems later on.
+;;;; Noted
 
 (def vamp-keys [:name :glitter-index])
 
@@ -43,6 +45,8 @@
   (clojure.edn/read-string some-str)
   ;; => ["something" else :hello 99 99.99]
 
+;;;; Nice. I am coming across this function for first time
+
   (map type (clojure.edn/read-string some-str))
   ;; => (java.lang.String
   ;;     clojure.lang.Symbol
@@ -52,7 +56,7 @@
 
   ;; In your case, just using Ingeger. is probably a better idea -- you'll get
   ;; an error thrown if something unexpected is encountered.
-
+;;;; Noted
   )
 
 (def conversions {:name identity
@@ -90,12 +94,14 @@
   ;; => ["win line 1" "win line 2"]
 
 ;;; I just noticed that this was given as example code. Bummer!
+;;;; :)
   )
 
 (parse (slurp filename))
 ;; => (["Anil" "12" "\r"] ["Nethra" "0" "\r"] ["Kullu" "1" "\r"] ["Mullu" "7" "\r"])
 
 ;;; Note: when I'm running this on my linux system, I'm not seeing \r output:
+;;;; Interesting
 (comment
   (parse (slurp filename))
   ;; => (["Anil" "12"] ["Nethra" "0"] ["Kullu" "1"] ["Mullu" "7"])
@@ -145,6 +151,9 @@
         (map vector [1 2 3 4 5 6 7 8 9 10 11] ["One" "Two"]))
   ;; => {1 "One", 2 "Two"}
 
+;;;; These examples are helpful. I knew that map could iterate over multiple
+;;;; sequences but it didn't occur to me here.
+
 ;;; Which should let us do something like this:
   (map (fn [row]
          (into {}
@@ -161,6 +170,7 @@
 ;;; Though that didn't make too much of a difference. You be the judge!
 ;;;
 ;;; ... and again, I see that I've wanted to rewrite code from the book ...
+;;;; Your version is definitely more readable!
   )
 
 
@@ -212,11 +222,10 @@
 (def suspect-validator {:name presence :glitter-index presence})
 
 (defn validate [key-func-map record]
-  (reduce
-   (fn [result [key val]]
-     (and result ((get key-func-map key) (key record))))
-   true
+  (every?
+   #((second %) (get record (first %)))
    key-func-map))
+
 
 (validate suspect-validator  {:name "Anil"})
 ;; => false
@@ -230,6 +239,8 @@
 ;;; If you want to make validate more compact, you migth be able to make use of
 ;;; `every?`.
 
+;;;; Yes. I have made the change to use every?. It has become more compact.
+
 (doc every?)
 "-------------------------
 clojure.core/every?
@@ -242,7 +253,7 @@ clojure.core/every?
 ;; CSV string. You’ll need to use the clojure.string/join function.
 
 (defn csv-convert [records]
-  (reduce (fn [arg1 arg2] (str arg1 "\n" arg2))
+  (reduce (fn [arg1 arg2] (clojure.string/join "\n" [arg1 arg2]))
           (map (fn [record]
                  (clojure.string/join "," [(:name record)
                                            (:glitter-index record)]))
@@ -254,4 +265,6 @@ clojure.core/every?
 ;;; Nice!
 ;;;
 ;;; Could you have used clojure.string/join in the outer loop too?
+
+;;;; Yes. I've made that change.
   )
