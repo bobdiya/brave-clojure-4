@@ -261,10 +261,25 @@ clojure.core/every?
 
 (csv-convert records);; => "Anil,2\nPradeep,12"
 
+(defn csv-convert-2 [records]
+  (clojure.string/join "\n"
+                       (map (fn [record]
+                              (clojure.string/join "," [(:name record)
+                                                        (:glitter-index record)]))
+                            records)))
+
+(csv-convert-2 records)
+;; => "Anil,2\nPradeep,12"
+
+
 (comment
 ;;; Nice!
 ;;;
 ;;; Could you have used clojure.string/join in the outer loop too?
 
 ;;;; Yes. I've made that change.
+;;;;; Nice! we shouldn't need the outer reduce either, since clojure.string/join
+;;;;; already is made to operate on sequences. See `csv-convert-2`.
+;;;;;
+;;;;; Great job!
   )
